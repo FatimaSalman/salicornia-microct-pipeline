@@ -1,5 +1,9 @@
 # Compatibility patches for leaf-traits-microct (Python 3.14 / NumPy 2.x / SciPy 1.x)
 
+Patches were applied to the `master` branch snapshot at commit
+`82c09df971621a6bf6e5d51060f1dc31cfae4700` (6 Nov 2019), downloaded as a ZIP
+archive from GitHub.
+
 Original tool: https://github.com/plant-microct-tools/leaf-traits-microct
 (Théroux-Rancourt et al. 2020, Applications in Plant Sciences — MIT License)
 
