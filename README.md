@@ -1,30 +1,70 @@
-# salicornia-microct-pipeline
+# Salicornia_Project — microCT structural phenotyping pipeline for *Salicornia europaea* stems
 
-Python scripts for converting VGStudio microCT files to an open, vendor-independent format (NRRD), assessing reconstructed-volume image quality (contrast-to-noise ratio, CNR), estimating anatomical tissue boundaries from radial texture profiles, denoising low-contrast volumes, and preparing training labels for Random Forest–based automated segmentation of *Salicornia europaea* stem tissue. Developed as part of a pilot study on microCT-based structural phenotyping of *Salicornia europaea* stems.
+Python scripts for converting VGSTUDIO microCT project files to an open,
+vendor-independent format (NRRD), assessing reconstructed-volume image quality
+(contrast-to-noise ratio, CNR), estimating anatomical tissue boundaries from
+radial texture profiles, denoising low-contrast volumes, generating training
+labels, and identifying predicted classes for Random Forest–based segmentation
+of the central cylinder in *Salicornia europaea* stems.
 
-**Associated manuscript:** *A Pipeline for microCT-Based Structural Phenotyping and Preliminary Deep Learning Assessment in Salicornia: A Methodological Pilot Study* (Salman, Kováč, Ďurkovič — submitted to *The Plant Journal*).
+**Associated manuscript:** Salman F., Kováč J., Ďurkovič J. — *MicroCT-Based
+Structural Phenotyping and Random Forest Segmentation of the Central Cylinder in
+Salicornia europaea Stems: A Methodological Pilot Study* (submitted to
+*The Plant Journal*).
+
+**Archived release:** https://doi.org/10.5281/zenodo.XXXXXXX (code)
+**Data record:** https://doi.org/10.5281/zenodo.XXXXXXX (raw volumes, models, predictions)
 
 ## Contents
 
 | File | Purpose |
 |---|---|
-| `vgl_to_nrrd.py` | Converts a VGStudio project file (`.vgl`) into a detached NRRD header (`.nhdr`) that points to the original `.vol` data, so the volume can be opened directly in 3D Slicer (or any NRRD-aware tool) without needing VGStudio or a Windows VM. |
-| `volume_quality_check.py` | Computes objective image-quality metrics (Otsu-based contrast-to-noise ratio, intensity statistics, edge sharpness) from a raw volume. |
-| `radial_boundary_estimation.py` | Computes a windowed local-intensity-texture radial profile centered on the stem, to identify candidate tissue-boundary radii (e.g., central cylinder/parenchyma cortex transition). |
-| `nlm_denoise_crop.py` | Applies non-local-means denoising to a cropped region centered on the stem for low-contrast volumes where the raw radial-texture profile is confounded by heteroscedastic noise. |
-| `build_label_stack.py` | Generates a multi-slice label stack (central cylinder+pith, parenchyma cortex, palisade tissue) from a fixed stem center and boundary radii, for use as Random Forest training input. |
-| `class_identification.py` | Confirms which predicted class value in a Random Forest output stack corresponds to which tissue class, and computes tissue volumes from voxel counts. |
-| `run_commands_reference.sh` | Reference log of the exact command-line invocations (training slice indices, rescale factors) used for each of the four samples. |
+| `vgl_to_nrrd.py` | Parses a VGSTUDIO project file (`.vgl`) and writes a detached NRRD header (`.nhdr`) pointing at the original `.vol` data, so the volume opens directly in 3D Slicer (or any NRRD-aware tool) without VGSTUDIO. No data are duplicated. |
+| `vol_to_tiff.py` | Reads a `.vol`/`.nhdr` pair and writes a multi-page 16-bit TIFF stack for downstream processing. |
+| `volume_quality_check.py` | Computes an Otsu-based contrast-to-noise ratio (CNR) and intensity statistics on five mid-volume slices, to flag volumes that need denoising before segmentation. |
+| `radial_boundary_estimation.py` | Computes a local-texture (windowed standard deviation) vs. radius profile centred on the stem and overlays candidate boundary circles, to estimate tissue-boundary radii (central cylinder / parenchyma cortex / palisade tissue). Includes a robust "solid-shape" stem-centre estimator. |
+| `nlm_denoise_crop.py` | Applies non-local-means denoising to a cropped region around the stem for low-contrast volumes whose radial profile is confounded by heteroscedastic noise, and compares raw vs. denoised profiles. |
+| `build_label_stack.py` | Generates ternary training-label stacks (central cylinder + pith, parenchyma cortex, palisade tissue) geometrically from a fixed stem centre and boundary radii. Labels are **not** manually traced. |
+| `class_identification.py` | Overlays the known central-cylinder radius on a predicted slice to identify which output value of the Random Forest prediction corresponds to central cylinder + pith. |
+| `run_commands_reference.sh` | Documentation file (not executable as-is) listing the exact parameters, software/hardware environment, and commands used for each of the four samples. |
+| `compatibility_patches.md` | Table of minimal changes required to run the third-party leaf-traits-microct pipeline under current Python/NumPy/SciPy/scikit-image versions. |
+| `requirements.txt` | Python package versions used for the manuscript. |
+
+## Relationship to the original analysis scripts
+
+The scripts in this repository are consolidated, parameterised versions of the
+per-sample scripts used during the analysis. The original per-sample scripts,
+run as-is to produce the manuscript results (including the volume computations
+reported in Tables 2 and 3), are archived unmodified in the Zenodo data record
+(`per_sample_scripts/`). The parameter values used for each sample are listed
+in `run_commands_reference.sh`.
 
 ## Third-party dependency: leaf-traits-microct
 
-We performed Random Forest training and full-stack prediction using the **leaf-traits-microct** pipeline (Théroux-Rancourt et al. 2020; https://github.com/gtrancourt/leaf-traits-microct), without modifying its core algorithm. Running it under a modern Python environment (3.14) required several compatibility fixes, documented in [`compatibility_patches.md`](compatibility_patches.md), including updated imports (`sklearn.externals` → `joblib`), NumPy/SciPy API renames, and an `img_as_ubyte` safe-casting workaround. These patches are provided as a diff against the original tool for transparency and reproducibility; please cite the original tool's authors when using it.
+Random Forest training and full-stack prediction were performed with the
+**leaf-traits-microct** pipeline (Théroux-Rancourt et al., 2020;
+https://github.com/plant-microct-tools/leaf-traits-microct), without modifying
+its classifier logic, feature layers, or training methodology. Running it under
+Python 3.14 required minimal compatibility fixes (e.g. `sklearn.externals` →
+`joblib`, removed NumPy/SciPy aliases, `img_as_ubyte` safe casting), documented
+as a table of changes in [`compatibility_patches.md`](compatibility_patches.md).
+Because the pipeline expects dual-channel (phase + absorption) input and the
+present data are single-channel, the same 8-bit stack was supplied to both
+inputs. Please cite the original tool when using it.
 
 ## Requirements
 
-- Python 3.8+ (compatibility notes above apply to 3.14 specifically)
-- `numpy`, `scipy`, `scikit-image`, `tifffile`
-- `pip install numpy scipy scikit-image tifffile --break-system-packages` (or use a virtual environment)
+- Python 3.8+ (the manuscript analyses used Python 3.14.4 on macOS 12.7.6)
+- `numpy`, `scipy`, `scikit-image`, `scikit-learn`, `tifffile`, `matplotlib`,
+  `joblib`, `PyWavelets`
+- Exact versions used for the manuscript are pinned in `requirements.txt`:
+  `pip install -r requirements.txt`
+- Fiji (ImageJ 1.54p) was used for 16-bit → 8-bit conversion; 3D Slicer 5.6.2
+  for visual inspection and manual annotation.
+
+All analyses, including Random Forest training and prediction, were run on a
+2017 MacBook Air (dual-core Intel Core i5, 8 GB RAM, no GPU); volumes were
+downsampled (rescale factor 2 or 4) before training for this reason.
 
 ## Usage
 
@@ -38,36 +78,57 @@ python3 vgl_to_nrrd.py "/path/to/Salicornia_5/Salicornia_5.vgl"
 python3 volume_quality_check.py "/path/to/Salicornia_5.nhdr"
 ```
 
-### 3. Estimate anatomical boundaries
+### 3. Export a 16-bit TIFF stack
+```bash
+python3 vol_to_tiff.py "/path/to/Salicornia_5.nhdr" Salicornia_5_stack.tif
+```
+Convert to 8-bit in Fiji (Image › Type › 8-bit, default display range) for the
+Random Forest step; see `run_commands_reference.sh`, section 0d.
+
+### 4. Estimate anatomical boundaries
+```bash
 python3 radial_boundary_estimation.py --stack Salicornia_1_stack.tif --slice 500 \
     --voxel-um 2.5 --center-y 520 --center-x 591 --candidate-radii 90 190 250
+```
 
-### 4. (If needed) Denoise a low-contrast volume
+### 5. (If needed) Denoise a low-contrast volume
+```bash
 python3 nlm_denoise_crop.py --stack Salicornia_1_stack.tif --slice 500 \
     --center-y 520 --center-x 591 --half-width 400 --voxel-um 2.5 --known-radius-um 87.5
+```
 
-### 5. Build training labels
-Edit the center/radii/slice-list constants at the top of `build_label_stack.py`
-for the sample you're processing (see run_commands_reference.sh for the values
-used for each of the four samples), then run:
-    python3 build_label_stack.py
+### 6. Build training labels
+Edit the centre / radii / slice-list constants at the top of
+`build_label_stack.py` for the sample being processed (values for the four
+manuscript samples are in `run_commands_reference.sh`), then:
+```bash
+python3 build_label_stack.py
+```
 
-### 6. Train and predict (leaf-traits-microct, see reference commands)
-See `run_commands_reference.sh` for the exact per-sample invocations used in the manuscript.
+### 7. Train and predict (leaf-traits-microct)
+See `run_commands_reference.sh`, section 4, for the exact per-sample invocations.
 
-### 7. Identify predicted classes and compute volumes
+### 8. Identify predicted classes
 Edit the `samples` dictionary at the top of `class_identification.py` with your
-prediction file paths, then run:
-    python3 class_identification.py
+prediction file paths, then:
+```bash
+python3 class_identification.py
+```
 
 ## Data
 
-Raw microCT volumes, trained Random Forest models, manually annotated training label stacks, or full-stack prediction volumes are not included in this repository due to file size (>100 MB per file). The corresponding author will provide them upon reasonable request.
+Raw microCT reconstructions (`.vgl`/`.vol` with detached NRRD headers), 16-bit
+and 8-bit TIFF stacks, 3D Slicer annotation files, geometrically generated
+training label stacks, trained Random Forest models, full-stack prediction
+volumes, the 12 manually annotated anatomical reference images, and the original
+per-sample scripts are archived at Zenodo: https://doi.org/10.5281/zenodo.XXXXXXX
 
 ## License
 
-Released under the [MIT License](LICENSE). Note: the third-party `leaf-traits-microct` tool referenced above has its own license; consult the original repository before redistributing.
+Released under the [MIT License](LICENSE). The third-party leaf-traits-microct
+tool has its own license; consult the original repository before redistributing.
 
 ## Citation
 
-If you use this pipeline, please cite the associated manuscript (details above; full citation to be updated upon publication).
+If you use this pipeline, please cite the associated manuscript (full citation
+to be updated upon publication) and the Zenodo code DOI above.
