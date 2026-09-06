@@ -22,6 +22,7 @@ Salicornia europaea Stems: A Methodological Pilot Study* (submitted to
 | `vgl_to_nrrd.py` | Parses a VGSTUDIO project file (`.vgl`) and writes a detached NRRD header (`.nhdr`) pointing at the original `.vol` data, so the volume opens directly in 3D Slicer (or any NRRD-aware tool) without VGSTUDIO. No data are duplicated. |
 | `vol_to_tiff.py` | Reads a `.vol`/`.nhdr` pair and writes a multi-page 16-bit TIFF stack for downstream processing. |
 | `volume_quality_check.py` | Computes an Otsu-based contrast-to-noise ratio (CNR) and intensity statistics on five mid-volume slices, to flag volumes that need denoising before segmentation. |
+| `prepare_grid_phase.py` | Converts a 16-bit TIFF stack (from `vol_to_tiff.py`) into an 8-bit `GRID-8bit.tif` by linear contrast-stretching a fixed intensity window (default 12000–50000 → 0–255) to 255, processed slice-by-slice; also creates a `PHASE-8bit.tif` symlink for the dual-channel leaf-traits-microct input. |
 | `radial_boundary_estimation.py` | Computes a local-texture (windowed standard deviation) vs. radius profile centred on the stem and overlays candidate boundary circles, to estimate tissue-boundary radii (central cylinder / parenchyma cortex / palisade tissue). Includes a robust "solid-shape" stem-centre estimator. |
 | `nlm_denoise_crop.py` | Applies non-local-means denoising to a cropped region around the stem for low-contrast volumes whose radial profile is confounded by heteroscedastic noise, and compares raw vs. denoised profiles. |
 | `build_label_stack.py` | Generates ternary training-label stacks (central cylinder + pith, parenchyma cortex, palisade tissue) geometrically from a fixed stem centre and boundary radii. Labels are **not** manually traced. |
@@ -59,8 +60,7 @@ inputs. Please cite the original tool when using it.
   `joblib`, `PyWavelets`
 - Exact versions used for the manuscript are pinned in `requirements.txt`:
   `pip install -r requirements.txt`
-- Fiji (ImageJ 1.54p) was used for 16-bit → 8-bit conversion; 3D Slicer 5.6.2
-  for visual inspection and manual annotation.
+- 3D Slicer 5.6.2 was used for visual inspection and manual annotation; Fiji (ImageJ 1.54p) was used for pixel-distance measurement to confirm the Salicornia 4 central-cylinder radius on the annotated cross-section (Figure 2b).
 
 All analyses, including Random Forest training and prediction, were run on a
 2017 MacBook Air (dual-core Intel Core i5, 8 GB RAM, no GPU); volumes were
