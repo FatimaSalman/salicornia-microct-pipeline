@@ -80,13 +80,24 @@ python3 vol_to_tiff.py "Salicornia_8.nhdr" Salicornia_8_stack.tif
 python3 volume_quality_check.py "Salicornia 1 scan 2.nhdr"    # CNR = 3.52
 # S4: CNR = 3.43 | S5: CNR = 3.78 | S8: CNR = 3.19  (manuscript Table 1)
 
-# 0d. 16-bit -> 8-bit conversion (Fiji, ImageJ 1.54p): Image > Type > 8-bit with
-#     the default display range, no Brightness/Contrast adjustment. Verified post
-#     hoc on S1 slice 500 by linear fit of 8-bit vs 16-bit values: 12,074 -> 0 and
-#     50,076 -> 255 (max residual 0.5 = rounding only); saturation <0.03% of voxels.
+# 0d. 16-bit -> 8-bit conversion (prepare_grid_phase.py): linear contrast
+# stretch, clipping to [12000, 50000] then rescaling to [0 , 255],
+# processed slice-by-slice (memory-safe for large stacks).
+python3 prepare_grid_phase.py --input Salicornia_1_stack.tif \
+    --sample-name Salicornia1_ --low 12000 --high 50000
+
+python3 prepare_grid_phase.py --input Salicornia_4_stack.tif \
+    --sample-name Salicornia4_ --low 12000 --high 50000
+
+python3 prepare_grid_phase.py --input Salicornia_5_stack.tif \
+    --sample-name Salicornia5_ --low 12000 --high 50000
+
+python3 prepare_grid_phase.py --input Salicornia_8_stack.tif \
+    --sample-name Salicornia8_ --low 12000 --high 50000
+    
 #     Output: image_folder/Salicornia1_/Salicornia1_GRID-8bit.tif
-#     PHASE-8bit.tif is an alias (symbolic link) of GRID-8bit.tif: the
-#     single-channel data were supplied to both inputs of the dual-channel
+#     PHASE-8bit.tif is symlink of GRID-8bit.tif: the single-channel
+#     data were supplied to both inputs of the dual-channel
 #     leaf-traits-microct pipeline (see manuscript Methods).
 
 # ------------------------------------------------------------------
