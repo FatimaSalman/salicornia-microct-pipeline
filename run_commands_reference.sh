@@ -71,10 +71,9 @@ python3 vgl_to_nrrd.py "Salicornia_8.vgl"      # -> "Salicornia_8.nhdr"
 
 # 0b. .vol + .nhdr -> multi-page 16-bit TIFF stack
 python3 vol_to_tiff.py "Salicornia 1 scan 2.nhdr" Salicornia_1_stack.tif
-python3 vol_to_tiff.py "alicornia 4 normalscan.nhdr" Salicornia_4_stack.tif
+python3 vol_to_tiff.py "Salicornia 4 normalscan.nhdr" Salicornia_4_stack.tif
 python3 vol_to_tiff.py "Salicornia_5.nhdr" Salicornia_5_stack.tif
 python3 vol_to_tiff.py "Salicornia_8.nhdr" Salicornia_8_stack.tif
-# (repeated for S4, S5, S8 -> Salicornia_4_stack.tif, Salicornia_5_stack.tif, Salicornia_8_stack.tif)
 
 # 0c. Contrast-to-noise ratio on 5 equally spaced mid-volume slices (20th-80th
 #     percentile of stack depth), Otsu split, CNR = |mu_high - mu_low| / min(sigma)
