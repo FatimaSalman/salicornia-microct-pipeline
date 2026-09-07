@@ -12,8 +12,8 @@ Structural Phenotyping and Random Forest Segmentation of the Central Cylinder in
 Salicornia europaea Stems: A Methodological Pilot Study* (submitted to
 *The Plant Journal*).
 
-**Archived release:** https://doi.org/10.5281/zenodo.XXXXXXX (code)
-**Data record:** https://doi.org/10.5281/zenodo.XXXXXXX (raw volumes, models, predictions)
+**Archived release:** https://doi.org/10.5281/zenodo.22641406 (code)
+**Data record:** https://doi.org/10.5281/zenodo.22641406 (raw volumes, models, predictions)
 
 ## Contents
 
