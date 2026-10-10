@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the paper."
+title: "Sample-adaptive volumetric quantification of the central cylinder in Salicornia europaea stems"
+abstract: >-
+  Analysis code for sample-adaptive radial boundary detection and random forest
+  tissue classification applied to X-ray microCT volumes of Salicornia europaea
+  stems.
+type: software
+license: MIT
+authors:
+  - family-names: Salman
+    given-names: Fatima
+  - family-names: Kovac
+    given-names: Jan
+  - family-names: Cardenas-Perez
+    given-names: Stefany
+  - family-names: Durkovic
+    given-names: Jaroslav
+keywords:
+  - X-ray microtomography
+  - image segmentation
+  - random forest
+  - plant anatomy
+  - Salicornia europaea
