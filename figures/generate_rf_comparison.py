@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-generate_rf_comparison_S5_S8.py
+generate_rf_comparison.py
 ================================
 
 Creates a visual RF-versus-reference comparison for:
 
   S5 / Ciechocinek 0 mM:
-      low RF agreement and directional under-segmentation
-      Dice = 0.670; Recall = 0.567
+      moderate RF agreement and directional under-segmentation
+      Dice = 0.742; Recall = 0.704
 
   S8 / Ciechocinek 1000 mM:
       near-complete RF-reference agreement
       Dice = 0.975; Recall = 0.966
 
 Output:
-  Figure4_RF_reference_prediction_comparison.png
+  Figure6_RF_reference_prediction_comparison.png
 
 Rows:
   S5 (C-0), S8 (C-1000)
@@ -65,7 +65,7 @@ SAMPLES = [
         # This is the actual final reference used by evaluation_slices.py.
         "reference_path": (
             BASE / "Salicornia_5" /
-            "S5_cc_labelmap_bufferfix.nrrd"
+            "C-0_cc_reference_mask.nrrd"
         ),
         "z": 500,
         "dice": 0.742,
@@ -95,7 +95,7 @@ SAMPLES = [
     },
 ]
 
-OUTPUT_PATH = BASE / "Figure4_RF_reference_prediction_comparison.png"
+OUTPUT_PATH = BASE / "Figure6_RF_reference_prediction_comparison.png"
 
 
 # ==========================================================
