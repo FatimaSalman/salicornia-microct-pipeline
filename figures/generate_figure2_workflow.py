@@ -26,7 +26,7 @@ FILES = {
     'B1': 'PanelB1_FINAL.png',
     'B2': 'PanelB2_FINAL.png',
     'C1': 'PanelC1_s5_longitudinal_zaveraged.tif',
-    'C2': 'PanelC2_s5_crosssection_zaveraged.tif',
+    'C2': 'PanelC2_s8_texture_z492.tif',
     'D':  'PanelD_boundary_methods.png',
     'E':  'PanelE_labels_vs_prediction.png',
     'F':  'PanelF_s8_3d_slicer.png',

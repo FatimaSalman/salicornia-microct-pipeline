@@ -87,7 +87,7 @@ ax.axhline(half_val_1, color='red', linestyle='--', linewidth=1, label='Half-max
 ax.axvline(r_um_1, color='red', linestyle=':', linewidth=1.8,
            label=f'Boundary = {r_um_1:.1f} µm')
 ax.plot(radii_1[peak_idx_1], peak_val_1, 'k^', markersize=8, label='Profile peak')
-ax.set_title('D1: Half-maximum profile\n(Inowrocław, 0 mM)', fontsize=10, fontweight='bold')
+ax.set_title('D1: Half-maximum profile\n(Inowroc\u0142aw, 0 mM)', fontsize=10, fontweight='bold')
 ax.set_xlabel('Radial distance from stem centre (µm)')
 ax.set_ylabel('Local texture (std. dev.)')
 ax.set_xlim(0, 150)
@@ -116,7 +116,7 @@ ax.grid(alpha=0.3)
 ax = axes[2]
 ax.hist(s8_texvals.ravel(), bins=150, color='#2ca02c', alpha=0.7, edgecolor='none')
 ax.axvline(OTSU_THRESH, color='purple', linestyle='--', linewidth=2,
-           label=f'Otsu threshold = {OTSU_THRESH:.0f}')
+           label=f'Otsu threshold = {OTSU_THRESH}')
 ax.set_title('D3: Otsu threshold on texture\n(Ciechocinek, 1000 mM)', fontsize=10, fontweight='bold')
 ax.set_xlabel('Local texture value (std. dev.)')
 ax.set_ylabel('Voxel count')

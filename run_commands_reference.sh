@@ -217,8 +217,6 @@ python3 figures/generate_figure5.py              # Fig. 5
 python3 figures/generate_rf_comparison.py        # Fig. 6, RF vs reference
 python3 figures/generate_figureS1.py             # Fig. S1
 
-# Fig. 5c, the 3D rendering, is produced inside 3D Slicer:
-#     exec(open('figures/slicer_render_C0.py').read())
 
 
 # =============================================================================

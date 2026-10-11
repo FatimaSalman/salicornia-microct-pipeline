@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """generate_panel_e.py
 Panel E: Reference training labels vs RF prediction,
-for a slice actually used in training (z=451, index=2).
+for a slice actually used in training (z=450, index=2).
 """
 
 import os
@@ -23,8 +23,8 @@ from skimage.transform import resize
 LABELS_PATH = os.path.join(DATA, "Salicornia_8/image_folder/Salicornia8_/labelled-stack.tif")
 PREDICTION_PATH = os.path.join(DATA, "Salicornia_8/image_folder/Salicornia8_/MLresults/Salicornia8_fullstack_prediction.tif")
 
-LABEL_INDEX = 2         # corresponds to full_z = 451
-FULL_Z = 451
+LABEL_INDEX = 2         # corresponds to full_z = 450
+FULL_Z = 450
 CC_CLASS_IN_PREDICTION = -1
 
 # ==========================================
@@ -82,7 +82,7 @@ value_to_index = {v: i for i, v in enumerate(sorted(label_colors))}
 label_crop_indexed = np.vectorize(value_to_index.get)(label_crop)
 
 axes[0].imshow(label_crop_indexed, cmap=cmap, vmin=0, vmax=3, interpolation="nearest")
-axes[0].set_title("Reference training labels\n Training slice z = 451",
+axes[0].set_title("Reference training labels\n Training slice z = 450",
                    fontsize=9, fontweight="bold")
 axes[0].set_xticks([]); axes[0].set_yticks([])
 
@@ -97,7 +97,7 @@ axes[0].legend(handles=legend_elements, loc="upper center",
 
 # --- E2: RF Prediction (binary CC mask) ---
 axes[1].imshow(pred_crop_binary, cmap="gray", vmin=0, vmax=1, interpolation="nearest")
-axes[1].set_title("Predicted central-cylinder class\nSame slice, z=451",
+axes[1].set_title("Predicted central-cylinder class\nSame slice, z = 450",
                    fontsize=9, fontweight="bold")
 axes[1].set_xticks([]); axes[1].set_yticks([])
 
