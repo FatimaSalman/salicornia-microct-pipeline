@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # ---------- settings ----------
 INPUT_DIR = Path(".")
 OUTPUT_PREFIX = "Figure4_final"
-CROP_TOP = 0.09  # نفس الفكرة: قص العنوان القديم s1-long إلخ
+CROP_TOP = 0.09  # crops off the old title (s1-long and so on)
 DPI = 600
 
 TITLES = [

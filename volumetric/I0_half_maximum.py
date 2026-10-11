@@ -208,11 +208,11 @@ def main():
         running_sum += new_slice
         zc += 1
 
-    print(f"\n✅ Total time: {time.time() - t0:.1f}s")
-    print(f"✅ Succeeded: {len(all_radii)} slices | ⚠️ Failed: {len(failed_slices)} slices")
+    print(f"\nTotal time: {time.time() - t0:.1f}s")
+    print(f"Succeeded: {len(all_radii)} slices | Failed: {len(failed_slices)} slices")
 
     r_vals = np.array([r for _, r in all_radii])
-    print(f"\n📊 Radius statistics across full volume:")
+    print(f"\nRadius statistics across full volume:")
     print(f"   mean={r_vals.mean():.2f}µm, median={np.median(r_vals):.2f}µm, "
           f"std={r_vals.std():.2f}µm")
     print(f"   min={r_vals.min():.1f}, max={r_vals.max():.1f}")
@@ -221,7 +221,7 @@ def main():
     volume_um3 = areas.sum() * SPACING
     volume_mm3 = volume_um3 / 1e9
     n_slices_used = len(all_areas)
-    print(f"\n🎯 CC VOLUME (S1) = {volume_mm3:.4f} mm³ = {volume_um3:,.0f} µm³")
+    print(f"\nCC VOLUME (S1) = {volume_mm3:.4f} mm³ = {volume_um3:,.0f} µm³")
     print(f"   (from {n_slices_used} slices out of {NZ} total)")
 
     r_equiv = np.sqrt(volume_um3 / (np.pi * n_slices_used * SPACING))
@@ -238,7 +238,7 @@ def main():
             "volume_mm3": volume_mm3,
             "saved_profiles": saved_profiles,
         }, f)
-    print(f"\n💾 Full results saved: {pkl_path}")
+    print(f"\nFull results saved: {pkl_path}")
 
 
 if __name__ == "__main__":

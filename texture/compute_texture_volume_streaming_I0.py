@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """compute_texture_volume_streaming.py
-نسخة موفّرة للذاكرة: تقرأ وتكتب شريحة-شريحة مباشرة من/إلى القرص
-لعينة S1 (I-0) - بدون تحميل الفوليوم الكامل بالـRAM."""
+Memory-light version: reads and writes slice by slice directly from and to disk,
+for sample S1 (I-0), without loading the whole volume into RAM."""
 
 import numpy as np
 from scipy.ndimage import uniform_filter
@@ -77,7 +77,7 @@ def compute_texture_streaming(nhdr_path, window=9,
 
     write_nhdr(out_nhdr_path, sizes=[nx, ny, nz], spacing=spacing,
                data_file_name=out_vol_name)
-    print(f"\n✅ Done. Load this file directly in Slicer:\n   {out_nhdr_path}")
+    print(f"\nDone. Load this file directly in Slicer:\n   {out_nhdr_path}")
 
 if __name__ == "__main__":
     compute_texture_streaming("Salicornia 1 scan 2.nhdr", window=9)

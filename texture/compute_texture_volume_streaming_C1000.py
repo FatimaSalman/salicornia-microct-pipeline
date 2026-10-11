@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """compute_texture_volume_streaming.py
-نسخة موفّرة للذاكرة بالكامل: تقرأ وتكتب شريحة-شريحة مباشرة من/إلى القرص،
-بدون تحميل الفوليوم الكامل بالـRAM إطلاقاً - تفادياً لمشكلة Out-Of-Memory
-التي حصلت مع sitk.WriteImage على النسخة الكاملة."""
+Fully memory-light version: reads and writes slice by slice directly from and to disk,
+never holding the whole volume in RAM, to avoid the out-of-memory failure
+that occurred with sitk.WriteImage on the full version."""
 
 import numpy as np
 from scipy.ndimage import uniform_filter
@@ -21,7 +21,7 @@ def parse_nhdr(nhdr_path):
     return info
 
 def write_nhdr(out_nhdr_path, sizes, spacing, data_file_name, dtype_str='unsigned short'):
-    """يكتب .nhdr جديد مطابق للأصلي، لكن يشاور على ملف texture الجديد."""
+    """Writes a new .nhdr identical to the original but pointing at the new texture file."""
     with open(out_nhdr_path, 'w') as f:
         f.write("NRRD0004\n")
         f.write(f"type: {dtype_str}\n")
@@ -69,7 +69,7 @@ def compute_texture_streaming(nhdr_path, window=9,
             tex_u16 = np.clip(tex, 0, 65535).astype(np.uint16)
             fout.write(tex_u16.tobytes())
 
-            # تحرير صريح (اختياري، Python بيعمل garbage collect تلقائي أصلاً)
+            # Explicit release (optional; Python garbage-collects anyway)
             del s, mean, mean_sq, var, tex, tex_u16
 
             if z % 100 == 0:
@@ -80,7 +80,7 @@ def compute_texture_streaming(nhdr_path, window=9,
 
     write_nhdr(out_nhdr_path, sizes=[nx, ny, nz], spacing=spacing,
                data_file_name=out_vol_name)
-    print(f"\n✅ Done. Load this file directly in Slicer:\n   {out_nhdr_path}")
+    print(f"\nDone. Load this file directly in Slicer:\n   {out_nhdr_path}")
 
 if __name__ == "__main__":
     compute_texture_streaming("Salicornia_8.nhdr", window=9)

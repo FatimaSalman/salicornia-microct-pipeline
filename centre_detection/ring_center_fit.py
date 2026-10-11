@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Stem center from the vascular ring, via radial "ring score" optimization.
-بدون عتبات: نبحث عن المركز الذي يجعل حلقة الـ texture أقوى وأكثر تجانساً زاوياً.
+No thresholds: find the centre that makes the texture ring strongest and most uniform in azimuth.
 score = peak_mean_texture * (1 - angular_CV)
 """
 
@@ -58,7 +58,7 @@ def main():
     tex = local_std(img, args.window)
     radii = np.arange(args.rmin, args.rmax + 1, 2, dtype=float)
 
-    # ---- بحث خشن: شبكة ±search px بخطوة 3 ----
+    # ---- coarse search: grid of +/-search px, step 3 ----
     offs = np.arange(-args.search, args.search + 1, 3)
     best = (-1, None)
     for dy in offs:
@@ -69,7 +69,7 @@ def main():
     s0, (cx, cy, r, pk, cv) = best
     print(f"Coarse: score={s0:.1f} at ({cx:.0f},{cy:.0f}), r={r:.0f}px, peak={pk:.1f}, CV={cv:.2f}")
 
-    # ---- تنقيح: ±3 px بخطوة 1 ----
+    # ---- refinement: +/-3 px, step 1 ----
     best = (-1, None)
     for dy in np.arange(-3, 4, 1):
         for dx in np.arange(-3, 4, 1):
@@ -81,7 +81,7 @@ def main():
     print("\n=== RESULT (ring-score fit) ===")
     print(f"Center (x, y)   = ({cx:.2f}, {cy:.2f})")
     print(f"Ring radius     = {r:.0f} px  ({r*2.5:.0f} µm)")
-    print(f"Peak / CV       = {pk:.1f} / {cv:.2f}   (CV منخفض = حلقة كاملة زاوياً)")
+    print(f"Peak / CV       = {pk:.1f} / {cv:.2f}   (low CV = azimuthally complete ring)")
     print(f"Offset from prim= ({cx-args.cx0:+.1f}, {cy-args.cy0:+.1f}) px")
 
     if args.save_plot:

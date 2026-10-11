@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 directional_radial_profile.py
-يقيس نفس الملف texture-vs-radius لكن على طول خط مفرد (زاوية واحدة)
-بدل المتوسط الدائري الكامل - للكشف عن اللاتناظر الاتجاهي.
+Measures the same texture-versus-radius curve, but along a single ray (one angle)
+instead of the full azimuthal average, in order to reveal directional anisotropy.
 """
 import numpy as np
 import tifffile
@@ -86,7 +86,7 @@ def main():
         ax1.plot(xs, ys, color=c, lw=1.2, alpha=0.7)
 
     ax1.plot(args.cx, args.cy, '+', color='yellow', ms=14, mew=2)
-    ax1.set_title('4 اتجاهات على الشريحة الخام')
+    ax1.set_title('four directions on the raw slice')
     ax1.set_xlim(args.cx-600, args.cx+600)
     ax1.set_ylim(args.cy+600, args.cy-600)
 
@@ -96,7 +96,7 @@ def main():
     ax2.legend()
     ax2.grid(alpha=0.3)
 
-    print("\n=== نتائج الحدود لكل اتجاه (µm) ===")
+    print("\n=== boundary results per direction (µm) ===")
     print(f"{'Direction':<15}{'cc':>10}{'pc/pt':>10}{'pt/bg':>10}")
     for label, (r_cc, r_pcpt, r_ptbg) in results.items():
         print(f"{label:<15}{r_cc:>10.1f}{r_pcpt:>10.1f}{r_ptbg:>10.1f}")

@@ -339,4 +339,4 @@ plt.savefig(
 
 plt.show()
 
-print(f"\n✅ Saved: {OUTPUT_PATH}")
+print(f"\nSaved: {OUTPUT_PATH}")

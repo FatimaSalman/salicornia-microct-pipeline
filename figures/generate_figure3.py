@@ -41,13 +41,13 @@ axes = axes.flat
 
 for ax, fpath, title in zip(axes, files, TITLES):
     img = load_img(fpath, CROP_TOP)
-    ax.imshow(img)          # ✅ بدون aspect="auto" — نفس أبعاد الصورة الأصلية
+    ax.imshow(img)          # no aspect="auto": keeps the original image proportions
     ax.axis("off")
-    # ✅ العنوان كـ text فوق الـ axes مباشرة، مسافة ثابتة كنسبة من ارتفاع الصورة
+    # Title drawn as text directly above the axes, at a fixed fraction of the image height
     ax.text(0, 1.03, title, transform=ax.transAxes,
              fontsize=9, fontweight="bold", ha="left", va="bottom")
 
-# ✅ نفس القيمة بالضبط أفقي وعمودي = نفس المسافة البصرية
+# The same value horizontally and vertically gives the same visual spacing
 GAP = 0.10
 fig.subplots_adjust(
     left=0.02, right=0.98,

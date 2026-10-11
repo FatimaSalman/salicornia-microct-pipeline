@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """compute_texture_volume_full.py
-حساب texture map (windowed std-dev) لكامل فوليوم S8
-وحفظه كـ .nrrd محاذي تمامًا للفوليوم الأصلي (نفس spacing/origin/direction)
-عشان نقدر نحمّله بـSlicer جنب الأصلي مباشرة."""
+Texture map (windowed standard deviation) for the whole S8 volume,
+written as a .nrrd exactly aligned with the original volume (same spacing/origin/direction)
+so that it can be loaded in Slicer next to the original."""
 
 import numpy as np
 import SimpleITK as sitk
@@ -34,13 +34,13 @@ def compute_texture_volume(nhdr_path, window=9, out_path="Salicornia_8_texture.n
     print(f"Texture value range: {texture.min():.1f} - {texture.max():.1f}")
 
     if save_as_uint16:
-        # توفير مساحة قرص (نصف الحجم)؛ آمن لأن قيم std-dev هنا أقل بكثير من 65535
+        # Halves the file size; safe, because the std-dev values here are far below 65535
         texture_out = np.clip(texture, 0, 65535).astype(np.uint16)
     else:
         texture_out = texture
 
     texture_img = sitk.GetImageFromArray(texture_out)
-    texture_img.CopyInformation(img)  # ينسخ spacing/origin/direction بالضبط من الأصلي
+    texture_img.CopyInformation(img)  # copies spacing/origin/direction exactly from the original
     sitk.WriteImage(texture_img, out_path)
     print(f"Saved aligned texture volume to: {out_path}")
 

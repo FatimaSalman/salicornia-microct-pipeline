@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # ---------- settings ----------
 INPUT_DIR = Path(".")
 OUTPUT_PREFIX = "Figure5_final"
-CROP_TOP = 0.0     # الصور مقصوصة أصلاً على البانل الأزرق بس، فما نحتاج قص إضافي
+CROP_TOP = 0.0     # the images are already cropped to the blue panel; no further crop needed
 DPI = 600
 
 TITLES = [
@@ -42,7 +42,7 @@ axes = axes.flat
 
 for ax, fpath, title in zip(axes, files, TITLES):
     img = load_img(fpath, CROP_TOP)
-    ax.imshow(img)          # بدون aspect="auto" — نفس أبعاد الصورة الأصلية
+    ax.imshow(img)          # no aspect="auto": keeps the original image proportions
     ax.axis("off")
     ax.text(0, 1.03, title, transform=ax.transAxes,
              fontsize=9, fontweight="bold", ha="left", va="bottom")

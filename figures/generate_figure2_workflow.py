@@ -6,10 +6,10 @@ import tifffile
 import os
 
 # ============================================================
-# 1) تحميل الصور
+# 1) Load the images
 # ============================================================
 def load_img(path):
-    """يحمّل الصورة بأمان، ويطبّع الصور 16-bit للعرض بتباين جيد"""
+    """Load an image safely, normalising 16-bit images for good display contrast."""
     if path.lower().endswith(('.tif', '.tiff')):
         img = tifffile.imread(path)
         if img.dtype in (np.uint16, np.int16):
@@ -34,7 +34,7 @@ FILES = {
 
 for k, v in FILES.items():
     if not os.path.exists(v):
-        raise FileNotFoundError(f"❌ الملف غير موجود: {v}")
+        raise FileNotFoundError(f"file not found: {v}")
 
 imgs = {k: load_img(v) for k, v in FILES.items()}
 
@@ -43,7 +43,7 @@ def aspect(img):
     return w / h
 
 # ============================================================
-# 2) حساب نسب الأبعاد (aspect ratios) لكل صورة/مجموعة
+# 2) Aspect ratio of each image and of each group
 # ============================================================
 aA1, aA2 = aspect(imgs['A1']), aspect(imgs['A2'])
 aB1, aB2 = aspect(imgs['B1']), aspect(imgs['B2'])
@@ -52,11 +52,11 @@ aD = aspect(imgs['D'])
 aE = aspect(imgs['E'])
 aF = aspect(imgs['F'])
 
-# مجموعة A: A1 وA2 جنب بعض (نفس الارتفاع)
+# Group A: A1 and A2 side by side (same height)
 groupA_aspect = aA1 + aA2
-# مجموعة B: B1 فوق B2 (نفس العرض) — 3D Slicer
+# Group B: B1 above B2 (same width) - 3D Slicer
 groupB_aspect = 1 / (1 / aB1 + 1 / aB2)
-# مجموعة C: C1 وC2 جنب بعض
+# Group C: C1 and C2 side by side
 groupC_aspect = aC1 + aC2
 
 row1_widths = [groupA_aspect, groupB_aspect, groupC_aspect]
@@ -64,7 +64,7 @@ row2_aspect = aD
 row3_widths = [aE, aF]
 
 # ============================================================
-# 3) حساب أبعاد الشكل النهائي (180mm عرض، حفاظ على النسب)
+# 3) Final figure dimensions (180 mm wide, aspect ratios preserved)
 # ============================================================
 W = 1.0
 H1 = W / sum(row1_widths)
@@ -85,7 +85,7 @@ outer = gridspec.GridSpec(
     hspace=0.06, figure=fig
 )
 
-# ---------------- الصف 1: A | B | C ----------------
+# ---------------- row 1: A | B | C ----------------
 row1 = gridspec.GridSpecFromSubplotSpec(
     1, 3, subplot_spec=outer[0],
     width_ratios=row1_widths, wspace=0.04
@@ -112,10 +112,10 @@ gC = gridspec.GridSpecFromSubplotSpec(
 axC1 = fig.add_subplot(gC[0])
 axC2 = fig.add_subplot(gC[1])
 
-# ---------------- الصف 2: D (عرض كامل) ----------------
+# ---------------- row 2: D (full width) ----------------
 axD = fig.add_subplot(outer[1])
 
-# ---------------- الصف 3: E | F ----------------
+# ---------------- row 3: E | F ----------------
 row3 = gridspec.GridSpecFromSubplotSpec(
     1, 2, subplot_spec=outer[2],
     width_ratios=row3_widths, wspace=0.04
@@ -124,7 +124,7 @@ axE = fig.add_subplot(row3[0])
 axF = fig.add_subplot(row3[1])
 
 # ============================================================
-# 4) عرض الصور + ليبل البانل
+# 4) Draw the images and the panel labels
 # ============================================================
 def show(ax, img, label='', label_position=(0.01,0.99)):
     cmap = 'gray' if img.ndim == 2 else None
@@ -154,14 +154,14 @@ show(axE,  imgs['E'],  'E')
 show(axF,  imgs['F'],  'F', label_position=(0.97, 0.97))
 axF.texts[-1].set_ha('right')
 # ============================================================
-# 5) الحفظ (PNG + TIFF + PDF)
+# 5) Save (PNG + TIFF + PDF)
 # ============================================================
 plt.savefig('Figure2_final.png', dpi=DPI, bbox_inches='tight', pad_inches=0.03)
 plt.savefig('Figure2_final.tiff', dpi=DPI, bbox_inches='tight', pad_inches=0.03)
 plt.savefig('Figure2_final.pdf', bbox_inches='tight', pad_inches=0.03)
 
-print("✅ تم الحفظ بنجاح:")
+print("saved:")
 print(f"   - Figure2_final.png  ({DPI} dpi)")
 print(f"   - Figure2_final.tiff ({DPI} dpi)")
 print(f"   - Figure2_final.pdf  (vector)")
-print(f"   أبعاد الشكل: {FIG_WIDTH_IN*25.4:.1f}mm × {FIG_HEIGHT_IN*25.4:.1f}mm")
+print(f"   figure size: {FIG_WIDTH_IN*25.4:.1f}mm × {FIG_HEIGHT_IN*25.4:.1f}mm")

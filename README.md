@@ -99,8 +99,8 @@ upstream repository, the version used, and the scripts specific to this study.
 
 ## Citation
 
-See `CITATION.cff`.
+See [`CITATION.cff`](CITATION.cff).
 
 ## Licence
 
-MIT. See `LICENSE`.
+MIT. See [`LICENSE`](LICENSE).

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """z_projection_center_S5.py
-حساب Z-projection (متوسط texture عبر نطاق شرائح) لإيجاد المركز الحقيقي
-لعينة S5 - تفادي فخ استخدام مركز الصورة الهندسي."""
+Z projection (texture averaged over a range of slices) to locate the true centre
+of sample S5, avoiding the trap of using the geometric image centre."""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -49,9 +49,9 @@ if __name__ == "__main__":
     nx, ny, nz = sizes
     print(f"Volume size: X={nx}, Y={ny}, Z={nz}")
 
-    # نطاق Z واسع نسبياً لتغطية جزء جيد من الساق (مشابه لمنطق S1: z=300-700 من 1000)
+    # Fairly wide Z range, to cover a good part of the stem (as for S1: z=300-700 of 1000)
     z_start, z_end = 300, 700
-    step = 10  # نأخذ كل 10 شرائح لتسريع الحساب (كافٍ لتقدير المركز)
+    step = 10  # every tenth slice; fast, and sufficient for a centre estimate
 
     print(f"Computing Z-projection over z={z_start}-{z_end} (step={step}) ...")
 
@@ -65,9 +65,9 @@ if __name__ == "__main__":
         count += 1
 
     avg_texture = accum_texture / count
-    print(f"تم استخدام {count} شريحة بالمتوسط")
+    print(f"{count} slices averaged")
 
-    # تقدير المركز: استخدام أعلى 20% من قيم التكستشر كأوزان (centroid موزون)
+    # Centre estimate: the top 20% of the texture values used as weights (weighted centroid)
     threshold_pct = np.percentile(avg_texture, 80)
     mask = avg_texture >= threshold_pct
     ys, xs = np.nonzero(mask)
@@ -76,8 +76,8 @@ if __name__ == "__main__":
     cy = np.average(ys, weights=weights)
     cx = np.average(xs, weights=weights)
 
-    print(f"\n🎯 المركز المقدّر (weighted centroid, top 20%): y={cy:.1f}, x={cx:.1f}")
-    print(f"   (مركز الصورة الهندسي كان سيكون: y={ny/2:.1f}, x={nx/2:.1f})")
+    print(f"\nEstimated centre (weighted centroid, top 20%): y={cy:.1f}, x={cx:.1f}")
+    print(f"   (the geometric image centre would have been: y={ny/2:.1f}, x={nx/2:.1f})")
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 7))
     axes[0].imshow(avg_texture, cmap='inferno')

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """S5_full_volume_grad_method.py
-البروتوكول النهائي لـS5: Z-denoising + ring-refined center + radial profile
-+ معيار GRAD (أقصى انحدار بعد القمة) - الطريقة الأقل انحيازاً (+3.2%)
-المُختارة بعد اختبار شامل لـ8 طرق مختلفة.
-مع rolling buffer للكفاءة وحفظ نتائج كاملة + labelmap للتصور 3D.
+Final protocol for S5: Z-denoising + ring-refined centre + radial profile
++ the GRAD criterion (steepest descent after the peak), the least biased method (+3.2%),
+selected after a systematic comparison of eight candidate criteria.
+Uses a rolling buffer for efficiency, and saves the full results plus a labelmap for 3D rendering.
 
-🆕 Also saves full radial-profile arrays for representative slices,
+Also saves full radial-profile arrays for representative slices,
    for manuscript Figure 2, Panel D2 (max-gradient method illustration)."""
 
 import numpy as np
@@ -17,8 +17,8 @@ import os
 import csv
 import time
 
-# 🆕 ADDED: output directory + representative slices to save profiles for
-OUTPUT_DIR = "."   # <-- غيّري هذا لمسار مجلد عملك، مثلاً "$SALICORNIA_DATA/Salicornia_5"
+# ADDED: output directory + representative slices to save profiles for
+OUTPUT_DIR = "."   # output directory; set SALICORNIA_DATA or edit this path
 SAVE_PROFILE_SLICES = [200, 500, 800]
 
 
@@ -87,7 +87,7 @@ def radial_profile(texture_img, cy, cx, max_r=250, n_angles=360):
     return profile
 
 def method_grad(p, peak_range=(50,95), bg_local=(115,135)):
-    """المعيار المُعتمد: نقطة أقصى انحدار بعد القمة."""
+    """The adopted criterion: the point of steepest descent after the peak."""
     idx = np.arange(*peak_range)
     valid = ~np.isnan(p[idx])
     if valid.sum() == 0:
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     spacing_um = 2.50000064
     print(f"Volume: {nx}x{ny}x{nz}, spacing={spacing_um}µm")
 
-    # === المعلمات النهائية المُعتمدة لـS5 ===
+    # === final adopted parameters for S5 ===
     HALF_WINDOW = 15
     PEAK_RANGE = (50, 95)
     BG_LOCAL = (115, 135)
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     buffer = deque(maxlen=FULL_WINDOW)
     running_sum = np.zeros((ny, nx), dtype=np.float64)
 
-    print("تعبئة الـbuffer الأولي...")
+    print("filling the initial buffer...")
     for z in range(FULL_WINDOW):
         s = load_single_slice(nhdr_path, z, sizes).astype(np.float64)
         buffer.append(s)
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     results = []
     labelmap_volume = np.zeros((nz, ny, nx), dtype=np.uint16)
     failed_slices = []
-    saved_profiles = {}   # 🆕 ADDED
+    saved_profiles = {}   # ADDED
 
     t_start = time.time()
 
@@ -177,7 +177,7 @@ if __name__ == "__main__":
         results.append((zc, cy_r, cx_r, r_px))
         draw_circle_on_labelmap(labelmap_volume[zc], cy_r, cx_r, r_px)
 
-        # 🆕 ADDED: save full profile array for representative slices
+        # ADDED: save full profile array for representative slices
         if zc in SAVE_PROFILE_SLICES:
             out_path = f"S5_profile_z{zc}.npy"
             np.save(out_path, profile_smooth)
@@ -191,13 +191,13 @@ if __name__ == "__main__":
             print(f"  z={zc}/{nz-HALF_WINDOW-1} | elapsed={elapsed:.1f}s | r={r_px}px")
 
     elapsed = time.time() - t_start
-    print(f"\n✅ اكتمل في {elapsed:.1f}s | نجح: {len(results)} | فشل: {len(failed_slices)}")
+    print(f"\ncompleted in {elapsed:.1f}s | succeeded: {len(results)} | failed: {len(failed_slices)}")
 
     radii_arr = np.array([r[3] for r in results])
     radii_um = radii_arr * spacing_um
 
     print(f"\n{'='*50}")
-    print(f"📊 إحصائيات نصف قطر cc (S5, method=grad):")
+    print(f"cc radius statistics (S5, method=grad):")
     print(f"   mean={radii_um.mean():.2f}µm ({radii_arr.mean():.2f}px)")
     print(f"   median={np.median(radii_um):.2f}µm")
     print(f"   std={radii_um.std():.2f}µm ({radii_um.std()/radii_um.mean()*100:.1f}%)")
@@ -206,26 +206,26 @@ if __name__ == "__main__":
 
     volume_um3 = np.sum(np.pi * radii_um**2 * spacing_um)
     volume_mm3 = volume_um3 / 1e9
-    print(f"\n🎯 CC VOLUME (S5) = {volume_mm3:.4f} mm³")
+    print(f"\nCC VOLUME (S5) = {volume_mm3:.4f} mm³")
 
     height_um = len(results) * spacing_um
     r_equiv = np.sqrt(volume_um3 / (np.pi * height_um))
     print(f"   r_equiv = {r_equiv:.2f}µm | height={height_um:.0f}µm")
 
-    with open('S5_grad_method_results.csv', 'w', newline='') as f:  # 🆕 path
+    with open('S5_grad_method_results.csv', 'w', newline='') as f:  # path
         writer = csv.writer(f)
         writer.writerow(['z','cy','cx','r_px','r_um'])
         for zc, cy, cx, r_px in results:
             writer.writerow([zc, f"{cy:.2f}", f"{cx:.2f}", r_px, f"{r_px*spacing_um:.2f}"])
-    print("💾 Saved: S5_grad_method_results.csv")
+    print("Saved: S5_grad_method_results.csv")
 
-    np.save('S5_cc_labelmap.npy', labelmap_volume)  # 🆕 path
+    np.save('S5_cc_labelmap.npy', labelmap_volume)  # path
 
-    # 🆕 ADDED: save saved_profiles dict as well, for later re-plotting
+    # ADDED: save saved_profiles dict as well, for later re-plotting
     import pickle
     with open('S5_profiles_dict.pkl', 'wb') as f:
         pickle.dump(saved_profiles, f)
-    print("💾 Saved: S5_profiles_dict.pkl")
+    print("Saved: S5_profiles_dict.pkl")
 
     check_zs = [100, 300, 500, 700, 900]
     check_zs = [z for z in check_zs if HALF_WINDOW < z < nz-HALF_WINDOW]
@@ -241,6 +241,6 @@ if __name__ == "__main__":
         axes[i].set_title(f'z={zc}, r={r_px if match else "N/A"}px')
         axes[i].axis('off')
     plt.tight_layout()
-    plt.savefig('S5_visual_check_grad.png', dpi=150)  # 🆕 path
+    plt.savefig('S5_visual_check_grad.png', dpi=150)  # path
     plt.show()
-    print("💾 Saved: S5_visual_check_grad.png")
+    print("Saved: S5_visual_check_grad.png")
