@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1413567501.svg)](https://doi.org/10.5281/zenodo.23303476)
+
 # Sample-adaptive volumetric quantification of the central cylinder in *Salicornia europaea* stems
 
 Analysis code for the X-ray microCT methodological study of central cylinder
@@ -16,7 +18,7 @@ deposited in the BioImage Archive under accession `S-BIADXXXXX`:
 
 Derived outputs that are not image data (texture-filtered volumes, trained
 classifier objects, radial profiles, volumetric logs) are deposited in Zenodo:
-`10.5281/zenodo.XXXXXXX`
+`10.5281/zenodo.23303476`
 
 **This repository contains code only.** No image data is stored here.
 
