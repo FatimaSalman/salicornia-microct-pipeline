@@ -12,9 +12,9 @@ propagates into volumetric estimates.
 ## Data
 
 The reconstructed volumes and the curated reference segmentations are
-deposited in the BioImage Archive under accession `S-BIADXXXXX`:
+deposited in the BioImage Archive under accession `S-BIAD4310`:
 
-<https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIADXXXXX>
+<https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD4310>
 
 Derived outputs that are not image data (texture-filtered volumes, trained
 classifier objects, radial profiles, volumetric logs) are deposited in Zenodo:
