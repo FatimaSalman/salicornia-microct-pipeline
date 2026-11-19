@@ -18,8 +18,8 @@ Dry run by default. Nothing is written unless you pass --rename.
 
 Usage
 -----
-    python3 prepare_bia_upload.py  --root ~/Desktop/Salicornia_Project
-    python3 prepare_bia_upload.py  --root ~/Desktop/Salicornia_Project --rename
+    python3 prepare_bia_upload.py  --root /path/to/data/root
+    python3 prepare_bia_upload.py  --root /path/to/data/root --rename
 """
 import argparse
 import os

@@ -1,31 +1,24 @@
 #!/usr/bin/env python3
 """
-generate_rf_comparison.py
-================================
+generate_rf_comparison.py  --  Figure 6 for The Plant Journal
+=========================================================
 
-Creates a visual RF-versus-reference comparison for:
+Random Forest prediction compared with the three-dimensional reference mask.
 
-  S5 / Ciechocinek 0 mM:
-      moderate RF agreement and directional under-segmentation
-      Dice = 0.742; Recall = 0.704
+  S5 / Ciechocinek 0 mM     Dice = 0.742; Recall = 0.704
+  S8 / Ciechocinek 1000 mM  Dice = 0.975; Recall = 0.966
 
-  S8 / Ciechocinek 1000 mM:
-      near-complete RF-reference agreement
-      Dice = 0.975; Recall = 0.966
+Rows:    S5 (C-0), S8 (C-1000)
+Columns: reference mask | RF prediction | voxel-wise error map
 
-Output:
-  Figure6_RF_reference_prediction_comparison.png
+TPJ specs applied here:
+  - width 169 mm (6.654 in); at 600 dpi that is 3992 px
+  - no bbox_inches / no tight_layout at save time, so the declared size survives
+  - panel letters (a)-(f), lower case, in parentheses, Helvetica/Arial, not bold
+  - no overall title inside the figure; that text belongs in the caption
+  - saved as Figure6.tif (LZW) + .png + .pdf
 
-Rows:
-  S5 (C-0), S8 (C-1000)
-
-Columns:
-  1. Reference CC mask
-  2. RF-predicted CC mask
-  3. Voxel-wise error map:
-       green = true positive
-       blue  = false negative
-       red   = false positive
+None of the data handling below has been changed.
 """
 
 import os
@@ -33,12 +26,12 @@ import os
 # Root of the data tree. Override with:  export SALICORNIA_DATA=/path
 DATA = os.environ.get("SALICORNIA_DATA", ".")
 
-
 from pathlib import Path
 
 import numpy as np
 import nrrd
 import tifffile
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from skimage.transform import resize
@@ -51,6 +44,23 @@ from skimage.transform import resize
 BASE = Path(DATA)
 
 CC_CLASS = -1
+
+# ---- TPJ figure settings ----------------------------------
+FIG_WIDTH_IN    = 6.654    # 169 mm -- do NOT change
+FIG_HEIGHT_IN   = 4.44     # keeps the original 10.5:7.0 proportion
+DPI             = 600      # composite of images and lettering
+PANEL_LETTER_PT = 11
+COL_TITLE_PT    = 9
+ROW_LABEL_PT    = 8
+LEGEND_PT       = 8
+
+# TPJ: "Labelling on figures should be no smaller than 8pt Helvetica.
+#       Figure sections should be designated with lower case letters."
+mpl.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Helvetica", "Arial", "DejaVu Sans"],
+    "savefig.dpi": DPI,
+})
 
 SAMPLES = [
     {
@@ -71,7 +81,7 @@ SAMPLES = [
         "dice": 0.742,
         "precision": 0.785,
         "recall": 0.704,
-        "volume_difference": "RF volume −10.4%",
+        "volume_difference": "RF volume -10.4%",
     },
     {
         "id": "S8",
@@ -91,15 +101,15 @@ SAMPLES = [
         "dice": 0.975,
         "precision": 0.983,
         "recall": 0.966,
-        "volume_difference": "RF volume −1.8%",
+        "volume_difference": "RF volume -1.8%",
     },
 ]
 
-OUTPUT_PATH = BASE / "Figure6_RF_reference_prediction_comparison.png"
+OUTPUT_PREFIX = BASE / "Figure6"
 
 
 # ==========================================================
-# Helper functions
+# Helper functions   (unchanged)
 # ==========================================================
 
 def resize_binary_mask(mask_yx, output_shape):
@@ -174,7 +184,7 @@ def build_error_rgb(reference_mask, predicted_mask):
 
 
 # ==========================================================
-# Load selected slices
+# Load selected slices   (unchanged)
 # ==========================================================
 
 loaded = []
@@ -239,10 +249,9 @@ for sample in SAMPLES:
 # ==========================================================
 
 fig, axes = plt.subplots(
-    2,
-    3,
-    figsize=(10.5, 7.0),
-    dpi=300,
+    2, 3,
+    figsize=(FIG_WIDTH_IN, FIG_HEIGHT_IN),
+    dpi=DPI,
 )
 
 column_titles = [
@@ -254,10 +263,14 @@ column_titles = [
 for col, title in enumerate(column_titles):
     axes[0, col].set_title(
         title,
-        fontsize=11,
-        fontweight="bold",
-        pad=10,
+        fontsize=COL_TITLE_PT,
+        fontweight="normal",
+        pad=6,
     )
+
+# (a) (b) (c) on the top row, (d) (e) (f) on the bottom row
+PANEL_LETTERS = [["(a)", "(b)", "(c)"],
+                 ["(d)", "(e)", "(f)"]]
 
 for row, item in enumerate(loaded):
     reference = item["reference"]
@@ -292,14 +305,24 @@ for row, item in enumerate(loaded):
         f"{item['title']}\n"
         f"Dice = {item['dice']:.3f}\n"
         f"{item['volume_difference']}",
-        fontsize=10,
-        fontweight="bold",
+        fontsize=ROW_LABEL_PT,
+        fontweight="normal",
     )
 
     for col in range(3):
-        axes[row, col].set_xticks([])
-        axes[row, col].set_yticks([])
-        axes[row, col].set_aspect("equal")
+        ax = axes[row, col]
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_aspect("equal")
+        # panel letter inside the panel, white on the dark background
+        ax.text(
+            0.015, 0.985, PANEL_LETTERS[row][col],
+            transform=ax.transAxes,
+            fontsize=PANEL_LETTER_PT, fontweight="normal", color="white",
+            ha="left", va="top",
+            bbox=dict(facecolor="black", alpha=0.55, pad=2.0,
+                      edgecolor="none"),
+        )
 
 # Error-map legend
 legend_handles = [
@@ -313,30 +336,26 @@ fig.legend(
     loc="lower center",
     ncol=3,
     frameon=False,
-    fontsize=9,
-    bbox_to_anchor=(0.5, 0.01),
+    fontsize=LEGEND_PT,
+    bbox_to_anchor=(0.5, 0.005),
 )
 
-fig.text(
-    0.5,
-    0.965,
-    "Random Forest prediction compared with the three-dimensional reference mask",
-    ha="center",
-    va="top",
-    fontsize=13,
-    fontweight="bold",
+# The overall title that used to sit inside the figure has been removed.
+# TPJ expects that sentence in the figure caption, not drawn on the image.
+
+# Fixed margins instead of tight_layout, so FIG_WIDTH_IN survives the save.
+fig.subplots_adjust(
+    left=0.13, right=0.99,
+    top=0.93, bottom=0.09,
+    wspace=0.04, hspace=0.06,
 )
 
-plt.tight_layout(
-    rect=(0.02, 0.06, 0.98, 0.93)
-)
+# No bbox_inches here: it crops after drawing and silently discards figsize.
+fig.savefig(f"{OUTPUT_PREFIX}.tif", dpi=DPI,
+            pil_kwargs={"compression": "tiff_lzw"})
+fig.savefig(f"{OUTPUT_PREFIX}.png", dpi=DPI)
+fig.savefig(f"{OUTPUT_PREFIX}.pdf")
 
-plt.savefig(
-    OUTPUT_PATH,
-    dpi=300,
-    bbox_inches="tight",
-)
-
-plt.show()
-
-print(f"\nSaved: {OUTPUT_PATH}")
+print(f"\nsaved {OUTPUT_PREFIX}.tif / .png / .pdf")
+print(f"declared size : {FIG_WIDTH_IN*25.4:.1f} x {FIG_HEIGHT_IN*25.4:.1f} mm")
+print(f"expected width: {round(FIG_WIDTH_IN*DPI)} px")

@@ -12,7 +12,7 @@ Estimates tissue boundary radii from a radial texture profile.
   5. Optional overlay of manual-reference radii (DIAGNOSTIC ONLY - do not use
      them to tune parameters per sample without documenting it).
 
-Manual reference convention (Ján's Fiji table):
+Manual reference convention  (Fiji measurement table):
   cc  = full diameter           -> R_cc     = cc/2
   pc  = one-sided thickness     -> R_pc_out = R_cc + pc
   pt  = one-sided thickness     -> R_pt_out = R_pc_out + pt

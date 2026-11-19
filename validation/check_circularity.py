@@ -7,7 +7,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-BASE = Path.home() / "Desktop" / "Salicornia_Project"
+import os
+# Data root. Override with:  export SALICORNIA_DATA=/path/to/data/root
+BASE = Path(os.environ.get("SALICORNIA_DATA",
+                           Path.home() / "Desktop" / "Salicornia_Project"))
 MASKS = {
     "I-0 (S1)":    BASE / "Salicornia 1, Inowroclaw 0 mM"    / "S1_cc_labelmap_proper.nrrd",
     "I-1000 (S4)": BASE / "Salicornia 4, Inowroclaw 1000 mM" / "cc_lm_v5.nrrd",

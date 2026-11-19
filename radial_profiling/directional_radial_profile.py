@@ -58,16 +58,16 @@ def main():
     radii_px = np.arange(1, rmax_px)
     radii_um = radii_px * vox
 
-    angles = {'0° (droite)': 0, '90° (haut)': 90,
-              '180° (gauche)': 180, '270° (bas)': 270}
+    angles = {'0 deg (right)': 0, '90 deg (up)': 90,
+              '180 deg (left)': 180, '270 deg (down)': 270}
 
     results = {}
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
     ax1.imshow(img, cmap='gray',
                vmin=np.percentile(img, 1), vmax=np.percentile(img, 99))
 
-    colors = {'0° (droite)': 'red', '90° (haut)': 'blue',
-              '180° (gauche)': 'green', '270° (bas)': 'orange'}
+    colors = {'0 deg (right)': 'red', '90 deg (up)': 'blue',
+              '180 deg (left)': 'green', '270 deg (down)': 'orange'}
 
     for label, deg in angles.items():
         th = np.deg2rad(deg)
